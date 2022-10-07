@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Assignment_3_Ellie_Tew.Data;
 using Assignment_3_Ellie_Tew.Models;
+using Tweetinvi;
+using VaderSharp2;
 
 namespace Assignment_3_Ellie_Tew.Controllers
 {
@@ -51,7 +53,24 @@ namespace Assignment_3_Ellie_Tew.Controllers
                 return NotFound();
             }
 
-            return View(movies);
+            MovieDetailsVM movieDetailsVM = new MovieDetailsVM();
+            movieDetailsVM.movie = movies;
+            movieDetailsVM.Tweets = new List<MovieTweet>();
+
+            var userClient = new TwitterClient("NG0FC7MrlyDMAnVk6Rn2iHoY9", "nvJis0p2O3de5BTTtN0sTzPjHiiqqYuUf0aVAa0qA96kalE289", "1578168705917353984-4zzsC1YQGmlUHMIQ27Wpnq4aeVkBJK", "NXl96HT0OgCk07qaVaIVFYCsJ1SDLL3nUXxGCk66dj8XR");
+            var searchResponse = await userClient.SearchV2.SearchTweetsAsync(movies.Title);
+            var tweets = searchResponse.Tweets;
+            var analyzer = new SentimentIntensityAnalyzer();
+            foreach (var tweetText in tweets)
+            {
+                var tweet = new MovieTweet();
+                tweet.TweetText = tweetText.Text;
+                var results = analyzer.PolarityScores(tweet.TweetText);
+                tweet.Sentiment = results.Compound;
+                movieDetailsVM.Tweets.Add(tweet);
+            }
+
+            return View(movieDetailsVM);
         }
 
         // GET: Movies/Create

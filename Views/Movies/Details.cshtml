@@ -1,52 +1,98 @@
-﻿@model Assignment_3_Ellie_Tew.Models.Movies
+﻿@model Assignment_3_Ellie_Tew.Models.MovieDetailsVM
 
 @{
     ViewData["Title"] = "Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Details</h1>
+<h1>What's the tea? (Movie Twitter Edition)</h1>
 
 <div>
     <h4>Movies</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
+            Title
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Title)
+            @Html.DisplayFor(model => model.movie.Title)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IMBDLink)
+            IMBD Link
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IMBDLink)
+            @Html.DisplayFor(model => model.movie.IMBDLink)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Genre)
+            Genre
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Genre)
+            @Html.DisplayFor(model => model.movie.Genre)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ReleaseYear)
+            Release Year
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ReleaseYear)
+            @Html.DisplayFor(model => model.movie.ReleaseYear)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MoviePoster)
+            Poster
         </dt>
         <dd class = "col-sm-10">
-            @if (Model.MoviePoster != null)
+            @if (Model.movie.MoviePoster != null)
             {
-                <img width="100" height="100" src="@Url.Action("GetMoviePoster", "Movies", new {Model.Id})" />
+                <img width="100" height="100" src="@Url.Action("GetMoviePoster", "Movies", new {Model.movie.Id})" />
             }
         </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Edit" asp-route-id="@Model?.movie.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
+
+<div>
+    Average Tweet Sentiment:
+    @if (Model.AverageTweetSentiment() != 0)
+    {
+        <span>@string.Format("{0:n2}", Math.Abs(Model.AverageTweetSentiment()) * 100)%</span>
+    }
+
+    @if (Model.AverageTweetSentiment() > 0)
+    {
+        <span>Positive</span>
+    }
+    else if (Model.AverageTweetSentiment() < 0)
+    {
+        <span>Negative</span>
+    }
+    else
+    {
+        <span>Neutral</span>
+    }
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Sentiment
+            </th>
+            <th>
+                Tweet
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var tweet in Model.Tweets)
+        {
+            <tr>
+                <td>
+                    @tweet.Sentiment
+                </td>
+                <td>
+                    @tweet.TweetText
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
